@@ -36,10 +36,10 @@ const ItemList = ({ items, onDeleteItem }) => {
             <span
               className={`status px-2 py-1 text-sm font-medium rounded ${
                 calculateStatus(item.expiryDate) === "Expired"
-                  ? "bg-red-100 text-red-700"
+                  ? "bg-red-400 text-red-700"
                   : calculateStatus(item.expiryDate) === "Expiring-soon"
                   ? "bg-yellow-100 text-yellow-700"
-                  : "bg-green-100 text-green-700".toLowerCase()
+                  : "bg-green-300 text-green-700".toLowerCase()
               } px-4 py-2 text-center rounded-full text-white w-28`}
             >
               {calculateStatus(item.expiryDate)}
