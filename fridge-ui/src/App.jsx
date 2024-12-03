@@ -11,7 +11,6 @@ const App = () => {
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    // Fetch items from ASP.NET API
     fetch("https://localhost:7064/api/FridgeItems")
       .then((response) => response.json())
       .then((data) => setItems(data))
@@ -20,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     const determineGreeting = () => {
-      const hour = new Date().getHours(); // Get current hour (0-23)
+      const hour = new Date().getHours();
       if (hour >= 5 && hour < 12) {
         return "Good Morning";
       } else if (hour >= 12 && hour < 18) {
@@ -30,20 +29,19 @@ const App = () => {
       }
     };
 
-    setGreeting(determineGreeting()); // Set the initial greeting
+    setGreeting(determineGreeting());
 
-    // Optional: Update the greeting every hour
     const interval = setInterval(() => {
       setGreeting(determineGreeting());
-    }, 3600000); // 3600000 ms = 1 hour
+    }, 3600000);
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const generateRecommendation = () => {
-      const isWeekend = [0, 6].includes(date.getDay()); // Check if it's Saturday or Sunday
-      const isFestiveSeason = date.getMonth() === 11; // Example: December is festive
+      const isWeekend = [0, 6].includes(date.getDay());
+      const isFestiveSeason = date.getMonth() === 11;
       const itemsExpiring = items.filter(
         (item) =>
           item.expiry &&
@@ -77,11 +75,8 @@ const App = () => {
   }, [items, date]);
 
   const addItem = (item) => {
-    // Add item to the local state optimistically
     setItems([...items, item]);
     console.log(JSON.stringify(item));
-
-    // Save to backend API
 
     fetch("https://localhost:7064/api/FridgeItems", {
       method: "POST",
@@ -101,7 +96,6 @@ const App = () => {
       .then((data) => console.log("Saved:", data))
       .catch((error) => {
         console.error("Error saving item:", error);
-        // Optionally remove the item from local state if saving fails
       });
   };
 

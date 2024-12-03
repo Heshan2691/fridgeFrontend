@@ -4,7 +4,7 @@ import axios from "axios";
 const AddItemForm = ({ onAddItem }) => {
   const [itemName, setItemName] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent duplicate submissions
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,24 +18,21 @@ const AddItemForm = ({ onAddItem }) => {
         status: "Healthy",
       };
 
-      // Post newItem to the backend
       const response = await axios.post(
         "https://localhost:7064/api/FridgeItems",
-        newItem // Send the complete object
+        newItem
       );
 
       console.log("Item posted:", response.data);
 
-      // Update UI only after the API confirms success
       onAddItem(response.data);
 
-      // Clear input fields after successful submission
       setItemName("");
       setExpiryDate("");
     } catch (error) {
       console.error("Error posting item:", error);
     } finally {
-      setIsSubmitting(false); // Reset submitting state
+      setIsSubmitting(false);
     }
   };
 

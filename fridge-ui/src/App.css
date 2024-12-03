@@ -76,9 +76,9 @@ h1 {
 }
 
 .align-items {
-  display: flex; /* Aligns items in a row */
-  justify-content: space-between; /* Distribute items evenly */
-  align-items: center; /* Vertically aligns items */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .status {
@@ -120,8 +120,8 @@ h1 {
 }
 
 .status-expiring-soon {
-  background-color: #ff9800; /* Orange color */
-  color: #fff; /* White text */
+  background-color: #ff9800;
+  color: #fff;
   border-radius: 12px;
   padding: 5px 10px;
   font-size: 0.9rem;
