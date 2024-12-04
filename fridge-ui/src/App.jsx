@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AddItemForm from "./components/AddItemForm";
 import ItemList from "./components/ItemList";
-import { FaSpinner } from "react-icons/fa";
 import "./App.css";
 
 const App = () => {
@@ -10,6 +9,7 @@ const App = () => {
   const [items, setItems] = useState([]);
   const [date, setDate] = useState(new Date());
 
+  // Fetch items from backend
   useEffect(() => {
     fetch("https://localhost:7064/api/FridgeItems")
       .then((response) => response.json())
@@ -17,6 +17,7 @@ const App = () => {
       .catch((err) => console.error(err));
   }, []);
 
+  // Determine greeting based on time of day
   useEffect(() => {
     const determineGreeting = () => {
       const hour = new Date().getHours();
@@ -38,46 +39,46 @@ const App = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Generate recommendation logic
   useEffect(() => {
     const generateRecommendation = () => {
       const isWeekend = [0, 6].includes(date.getDay());
-      const isFestiveSeason = date.getMonth() === 11;
-      const itemsExpiring = items.filter(
-        (item) =>
-          item.expiry &&
-          new Date(item.expiry) < new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
-      ); // Expiry within 2 days
+      const isFestiveSeason = date.getMonth() === 11; // December
+      const itemsExpiringSoon = items.filter((item) => {
+        const expiryDate = new Date(item.expiryDate);
+        const diffInDays = (expiryDate - date) / (1000 * 60 * 60 * 24);
+        return diffInDays > 0 && diffInDays <= 7; // Expiring in 7 days or less
+      });
+      const expiredItems = items.filter((item) => {
+        const expiryDate = new Date(item.expiryDate);
+        return expiryDate < date; // Already expired
+      });
 
-      if (itemsExpiring.length > 0) {
-        return `🚨 "Don't let your fridge treasures turn into trash! Check items nearing their expiry dates."`;
+      if (expiredItems.length > 0) {
+        return `🚨 Warning! ${expiredItems.length} item(s) in your fridge have already expired. Time to clean up!`;
+      } else if (itemsExpiringSoon.length > 0) {
+        return `⚠️ Heads up! ${itemsExpiringSoon.length} item(s) are nearing expiry. Use them soon!`;
       } else if (items.length === 0) {
-        return `🌞 "Your fridge looks empty! It's time to go grocery shopping."`;
+        return `🌞 Your fridge looks empty! It's time to go grocery shopping.`;
       } else if (isWeekend) {
-        return `🛒 "It's better to stock up before the weekend rush!"`;
+        return `🛒 It's the weekend! Stock up before the rush.`;
       } else if (isFestiveSeason) {
-        return `🎉 "A festive feast is on the horizon! Check your fridge and start planning ahead."`;
-      } else if (items.length > 10) {
-        return `📦 "Overcrowded fridge? Use what you have before shopping for more."`;
-      } else if (items.some((item) => item.name === "vegetables")) {
-        return `🍃 "Fresh veggies detected! A healthy salad might be a great idea."`;
-      } else if (items.some((item) => item.name === "cheese")) {
-        return `🧀 "Got cheese? Add some crackers to your list for a perfect pairing!"`;
-      } else if (items.some((item) => item.name === "drinks")) {
-        return `💧 "Are you stocked up on drinks? Stay hydrated with fresh juices or water."`;
-      } else if (items.some((item) => item.name === "snacks")) {
-        return `❤️ "Out of snacks? Check the fridge for family favorites before the next grocery run."`;
+        return `🎉 A festive feast is on the horizon! Check your fridge and start planning ahead.`;
+      } else if (items.length > 15) {
+        return `📦 Your fridge is overcrowded with ${items.length} items. Use what you have before buying more.`;
+      } else if (items.length <= 5) {
+        return `🛒 Your fridge has only ${items.length} item(s). Time to restock with fresh groceries.`;
       } else {
-        return `🍲 "Thinking of meal prepping? Check if your fridge has all the essentials."`;
+        return `🍲 Your fridge is stocked with ${items.length} item(s). Happy cooking and meal prepping!`;
       }
     };
 
     setRecommendation(generateRecommendation());
   }, [items, date]);
 
+  // Add item to fridge
   const addItem = (item) => {
     setItems([...items, item]);
-    console.log(JSON.stringify(item));
-
     fetch("https://localhost:7064/api/FridgeItems", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -85,7 +86,6 @@ const App = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          console.error("Response status:", response.status);
           throw new Error("Failed to save item to the backend");
         }
         return response.json();
@@ -93,17 +93,17 @@ const App = () => {
       .then((savedItem) => {
         console.log("Item saved to backend:", savedItem);
       })
-      .then((data) => console.log("Saved:", data))
       .catch((error) => {
         console.error("Error saving item:", error);
       });
   };
 
+  // Delete item from fridge
   const deleteItem = (id) => {
     setItems(items.filter((item) => item.id !== id));
     fetch(`https://localhost:7064/api/FridgeItems/${id}`, {
       method: "DELETE",
-    });
+    }).catch((error) => console.error("Error deleting item:", error));
   };
 
   return (

@@ -6,7 +6,16 @@ module.exports = {
     "./src/components/ItemList.jsx",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        red: {
+          700: "#B91C1C",
+        },
+        green: {
+          700: "#15803D",
+        },
+      },
+    },
   },
   plugins: [],
 };
