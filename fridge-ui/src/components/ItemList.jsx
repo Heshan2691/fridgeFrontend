@@ -39,7 +39,7 @@ const ItemList = ({ items, onDeleteItem }) => {
                   ? "bg-red-400 text-red-700"
                   : calculateStatus(item.expiryDate) === "Expiring-soon"
                   ? "bg-yellow-100 text-yellow-700"
-                  : "bg-green-300 text-green-700".toLowerCase()
+                  : "bg-green-400 text-green-700".toLowerCase()
               } px-4 py-2 text-center rounded-full text-white w-28`}
             >
               {calculateStatus(item.expiryDate)}
